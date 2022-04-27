@@ -23,26 +23,33 @@ def main():
     client = connect_to_server(host, port)
 
     while True:
-        mode = input("请选择模式(1:发送文件，2:接收文件，3：关闭连接):")
-        if mode == "1":
-            data = {"type": "c2s"}
-            send_json(client, data)
-            send(client)
-        elif mode == "2":
-            data = {"type": "s2c"}
-            send_json(client, data)
-            receive(client,save_path)
-        elif mode == "3":
-            data = {"type": "close"}
-            send_json(client, data)
-            return
-        else:
-            print("输入错误，请重新输入")
+        try:
+            mode = input("请选择模式(1:发送文件，2:接收文件，3：关闭连接):")
+            if mode == "1":
+                data = {"type": "c2s"}
+                send_json(client, data)
+                send(client)
+            elif mode == "2":
+                data = {"type": "s2c"}
+                send_json(client, data)
+                receive(client,save_path)
+            elif mode == "3":
+                data = {"type": "close"}
+                send_json(client, data)
+                break
+            else:
+                print("输入错误，请重新输入")
+        except ConnectionAbortedError:
+            print("连接中断")
+            break
+        except FunctionTimedOut:
+            print("对方无响应")
+            break
+    client.close()
 
 
 
 if __name__ == "__main__":
     save_path = input("请输入保存路径（默认当前路径）:")
     save_path = save_path if len(save_path) != 0 else os.getcwd()
-
     main()
